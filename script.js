@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Returns allowed color options for a given model
      */
     function getColorsForModel(modelId) {
-        if (modelId === 'Eric') {
+        if (modelId === 'Eric' || modelId === 'Ebbe') {
             return colorOptions.filter(opt => !ericExcludedColors.includes(opt.text));
         }
         return colorOptions;
@@ -116,10 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
         model_id: modelSelect.value,
         conf_id: modelSelect.options[modelSelect.selectedIndex].getAttribute('data-conf'),
         get type_id() {
-            return this.model_id === 'Eric' ? 'RIM' : 'TT';
+            return (this.model_id === 'Eric' || this.model_id === 'Ebbe') ? 'RIM' : 'TT';
         },
         get variant() {
-            return this.model_id === 'Eric' ? 'RIM_BASIC' : '850';
+            return (this.model_id === 'Eric' || this.model_id === 'Ebbe') ? 'RIM_BASIC' : '850';
         },
         linked: syncCheckbox.checked
     };
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let queryParams = [];
         const commonParams = `INNERRIM=${encodeURIComponent(state.rim)}&TEMPLE=${encodeURIComponent(state.back)}&CONF=${encodeURIComponent(state.conf_id)}`;
 
-        if (state.model_id === 'Eric') {
+        if (state.model_id === 'Eric' || state.model_id === 'Ebbe') {
             queryParams.push(`LOWERRIM=${encodeURIComponent(state.front)}`);
             queryParams.push(`UPPERRIM=${encodeURIComponent(state.front)}`);
         } else {
@@ -211,7 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { text: 'Green', value: 'K175' },
             { text: 'Dark Blue', value: 'K259' },
             { text: 'Tortoise', value: 'K204' },
-            { text: 'Black', value: 'K24M' }
+            { text: 'Black', value: 'K24M' },
+            { text: 'Grey Transp.', value: 'K272' }
+        ],
+        'Ebbe': [
+            { text: 'Green', value: 'K175' },
+            { text: 'Havana', value: 'K25' },
+            { text: 'Shiny Black', value: 'K199' }
         ]
     };
 
