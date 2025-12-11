@@ -12,9 +12,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalUrlInput = document.getElementById('final-url');
     const emptyState = document.getElementById('empty-state');
     const copyBtn = document.getElementById('copy-btn');
+    const humanModeContainer = document.getElementById('human-mode-container');
+    const humanModeToggle = document.getElementById('human-mode-toggle');
+    const footerPanel = document.querySelector('.footer-bar'); // Use querySelector for class
+
+    // Feature Flag
+    const IS_HUMAN_MODE_ENABLED = true;
 
     // Data Configuration
     const CONFIG = {
+        humanImages: {
+            '5808': 'https://drive.google.com/thumbnail?id=1CqVG7dWCwhenqqafYLWyYAZnkMYdua2G&sz=w1000',
+            '5801': 'https://drive.google.com/thumbnail?id=19GKx6a8UqDIK9jAQb68GeGRShzUUwoq9&sz=w1000',
+            '5810': 'https://drive.google.com/thumbnail?id=1fktSFvLmbrLy32xWkzmvD-plXLlUWCmy&sz=w1000',
+            'Eric': 'https://not.available.yet', // Not available
+            'Ebbe': 'https://drive.google.com/thumbnail?id=1ie_OqdbTU-Ona0hcAIu0eTJpRsZaa_rz&sz=w1000',
+            'Gunter': 'https://drive.google.com/thumbnail?id=1kn805FDT3cO37k5RMd5nc8q3ZYxQM9Ij&sz=w1000',
+            'Lex': 'https://not.available.yet' // Not available
+        },
         colors: [
             { text: 'Navy Grey', value: 'U16' },
             { text: 'Bronze', value: 'U12' },
@@ -196,7 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
         linked: syncCheckbox.checked,
 
         // Curret Model Instance
-        currentModel: null
+        currentModel: null,
+
+        // UI State
+        isHumanMode: false
     };
 
     /**
@@ -327,9 +345,71 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.src = finalUrl;
     }
 
+    /**
+     * Updates the Human Mode UI State
+     */
+    function updateOneUIState() {
+        const iconSpan = humanModeToggle.querySelector('.material-symbols-outlined');
+
+        if (state.isHumanMode) {
+            // Updated Icon
+            iconSpan.textContent = 'face_retouching_off';
+
+            // Hide Footer
+            footerPanel.classList.add('hidden');
+
+            // Disable Inputs (except Model)
+            perspectiveSelect.disabled = true;
+            frontSelect.disabled = true;
+            backSelect.disabled = true;
+            rimSelect.disabled = true;
+            syncCheckbox.disabled = true;
+
+            // Show Human Image
+            const humanUrl = CONFIG.humanImages[state.model_id];
+
+            if (humanUrl) {
+                previewImage.src = humanUrl;
+                previewImage.classList.add('visible');
+                emptyState.classList.add('hidden');
+            } else {
+                // Determine behavior for missing image? Using empty state for now.
+                previewImage.classList.remove('visible');
+                emptyState.classList.remove('hidden');
+            }
+
+        } else {
+            // Restore Icon
+            iconSpan.textContent = 'face';
+
+            // Show Footer
+            footerPanel.classList.remove('hidden');
+
+            // Enable Inputs
+            perspectiveSelect.disabled = false;
+            frontSelect.disabled = false;
+            backSelect.disabled = false;
+            rimSelect.disabled = false;
+            syncCheckbox.disabled = false;
+
+            // Update UI with generated Product URL
+            updateUI();
+        }
+    }
+
     // --- Event Listeners ---
 
+    if (IS_HUMAN_MODE_ENABLED) {
+        humanModeContainer.classList.remove('hidden');
+
+        humanModeToggle.addEventListener('click', () => {
+            state.isHumanMode = !state.isHumanMode;
+            updateOneUIState();
+        });
+    }
+
     frontSelect.addEventListener('change', (e) => {
+        if (state.isHumanMode) return; // Should be disabled, but safety check
         state.front = e.target.value;
         if (state.linked) {
             state.back = state.front;
@@ -379,7 +459,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateColorDropdowns();
 
         // 3. Update UI
-        updateUI();
+        if (state.isHumanMode) {
+            updateOneUIState();
+        } else {
+            updateUI();
+        }
     });
 
     copyBtn.addEventListener('click', async () => {

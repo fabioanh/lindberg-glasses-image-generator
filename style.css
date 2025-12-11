@@ -197,6 +197,14 @@ body {
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
 }
 
+#preview-image.visible {
+    opacity: 1;
+}
+
+#preview-image:not(.visible) {
+    opacity: 0;
+}
+
 .empty-state {
     color: var(--text-secondary);
     font-size: 1.1rem;
@@ -251,6 +259,20 @@ body {
 .icon-btn:hover {
     background: var(--control-hover);
     color: var(--text-primary);
+}
+
+/* Helper Classes */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    opacity: 1;
+}
+
+/* Toggle Wrapper specific */
+.toggle-wrapper {
+    min-width: auto;
 }
 
 /* Responsive */
