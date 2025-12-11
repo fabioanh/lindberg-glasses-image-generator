@@ -13,20 +13,191 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.getElementById('empty-state');
     const copyBtn = document.getElementById('copy-btn');
 
-    // Shared Color Options
-    const colorOptions = [
-        { text: 'Navy Grey', value: 'U16' },
-        { text: 'Bronze', value: 'U12' },
-        { text: 'Blue', value: '107' },
-        { text: 'Dark Blue', value: 'U13' },
-        { text: 'Light Blue', value: '20' },
-        { text: 'Sky Blue', value: '107' },
-        { text: 'Wine', value: 'U14' },
-        { text: 'Orange', value: 'U15' },
-        { text: 'Black', value: 'U9' },
-        { text: 'Light Silver', value: '05' },
-        { text: 'Grey', value: '10' }
-    ];
+    // Data Configuration
+    const CONFIG = {
+        colors: [
+            { text: 'Navy Grey', value: 'U16' },
+            { text: 'Bronze', value: 'U12' },
+            { text: 'Blue', value: '107' },
+            { text: 'Dark Blue', value: 'U13' },
+            { text: 'Light Blue', value: '20' },
+            { text: 'Sky Blue', value: '107' },
+            { text: 'Wine', value: 'U14' },
+            { text: 'Orange', value: 'U15' },
+            { text: 'Black', value: 'U9' },
+            { text: 'Light Silver', value: '05' },
+            { text: 'Grey', value: '10' }
+        ],
+        ericExcludedColors: ['Light Silver', 'Orange', 'Wine', 'Sky Blue', 'Blue'],
+        rims: {
+            '5808': [
+                { text: 'Green', value: 'K277' },
+                { text: 'Blue', value: 'K160' },
+                { text: 'Beige', value: 'K223' },
+                { text: 'Havana', value: 'K25' },
+                { text: 'Black', value: 'K24M' }
+            ],
+            '5801': [
+                { text: 'Green', value: 'K175' },
+                { text: 'Black', value: 'K263' },
+                { text: 'Havana', value: 'K25' },
+                { text: 'Beige', value: 'K223' },
+                { text: 'Grey', value: 'K26' },
+                { text: 'Tortoise', value: 'K204' },
+                { text: 'Deep red', value: 'K258' }
+            ],
+            '5810': [
+                { text: 'Green', value: 'K175' },
+                { text: 'Dark Blue', value: 'K259' },
+                { text: 'Tortoise', value: 'K204' },
+                { text: 'Black', value: 'K24M' }
+            ],
+            'Eric': [
+                { text: 'Green', value: 'K175' },
+                { text: 'Dark Blue', value: 'K259' },
+                { text: 'Tortoise', value: 'K204' },
+                { text: 'Black', value: 'K24M' },
+                { text: 'Grey Transp.', value: 'K272' }
+            ],
+            'Ebbe': [
+                { text: 'Green', value: 'K175' },
+                { text: 'Havana', value: 'K25' },
+                { text: 'Shiny Black', value: 'K199' }
+            ],
+            'Gunter': [
+                { text: 'Green', value: 'K175' },
+                { text: 'Black', value: 'K24M' },
+                { text: 'Transparent Blue', value: 'K228' }
+            ],
+            'Lex': [
+                { text: 'Brown', value: 'K162M' },
+                { text: 'Havana Matte', value: 'K25M' },
+                { text: 'Black Matte', value: 'K199M' },
+                { text: 'Green', value: 'K175' },
+                { text: 'Transparent Blue', value: 'K228' }
+            ]
+        }
+    };
+
+    // --- Factory Pattern Implementation ---
+
+    /**
+     * Abstract Base Class for Glasses Models
+     */
+    class GlassesModel {
+        constructor(modelId, confId) {
+            if (this.constructor === GlassesModel) {
+                throw new Error("Abstract classes can't be instantiated.");
+            }
+            this.modelId = modelId;
+            this.confId = confId;
+        }
+
+        getTypeId() {
+            throw new Error("Method 'getTypeId()' must be implemented.");
+        }
+
+        getVariant() {
+            throw new Error("Method 'getVariant()' must be implemented.");
+        }
+
+        getAllowedColors() {
+            // Default: All colors allowed
+            return CONFIG.colors;
+        }
+
+        getRimOptions() {
+            return CONFIG.rims[this.modelId] || CONFIG.rims['5808'];
+        }
+
+        getUrlParams(front, back, rim, conf) {
+            // Common params
+            const common = `INNERRIM=${encodeURIComponent(rim)}&TEMPLE=${encodeURIComponent(back)}&CONF=${encodeURIComponent(conf)}`;
+            const specific = this.getSpecificParams(front);
+            return `${specific}&${common}`;
+        }
+
+        getSpecificParams(front) {
+            throw new Error("Method 'getSpecificParams()' must be implemented.");
+        }
+    }
+
+    /**
+     * Titanium Model (e.g. 5808, 5801, 5810)
+     */
+    class TitaniumModel extends GlassesModel {
+        getTypeId() {
+            return 'TT';
+        }
+
+        getVariant() {
+            return '850';
+        }
+
+        getSpecificParams(front) {
+            return `FRONT=${encodeURIComponent(front)}`;
+        }
+    }
+
+    /**
+     * Air Titanium Model (e.g. Eric, Ebbe)
+     * Formerly AcetateRim/Eric logic
+     */
+    class AirTitaniumModel extends GlassesModel {
+        getTypeId() {
+            return 'RIM';
+        }
+
+        getVariant() {
+            return 'RIM_BASIC';
+        }
+
+        getAllowedColors() {
+            // Filter out excluded colors
+            return CONFIG.colors.filter(opt => !CONFIG.ericExcludedColors.includes(opt.text));
+        }
+
+        getSpecificParams(front) {
+            return `LOWERRIM=${encodeURIComponent(front)}&UPPERRIM=${encodeURIComponent(front)}`;
+        }
+    }
+
+    /**
+     * Factory to create model instances
+     */
+    class ModelFactory {
+        static create(modelId, confId) {
+            switch (modelId) {
+                case 'Eric':
+                case 'Ebbe':
+                case 'Gunter':
+                case 'Lex':
+                    return new AirTitaniumModel(modelId, confId);
+                case '5808':
+                case '5801':
+                case '5810':
+                default:
+                    return new TitaniumModel(modelId, confId);
+            }
+        }
+    }
+
+    // --- Application Logic ---
+
+    // State definition
+    let state = {
+        base: "https://customiser-images.lindberg.com/model/{type_id}/{model_id}/{perspective}/{variant}/ACETATE",
+        front: frontSelect.value,
+        back: backSelect.value,
+        rim: rimSelect.value,
+        perspective: perspectiveSelect.value,
+        model_id: modelSelect.value,
+        conf_id: modelSelect.options[modelSelect.selectedIndex].getAttribute('data-conf'),
+        linked: syncCheckbox.checked,
+
+        // Curret Model Instance
+        currentModel: null
+    };
 
     /**
      * Populates a select element with options
@@ -41,29 +212,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize Dropdowns - Moved to function to allow dynamic updates
-
-    // Eric Excluded Colors
-    const ericExcludedColors = ['Light Silver', 'Orange', 'Wine', 'Sky Blue', 'Blue'];
-
-    // State variable declaration
-    let state;
+    /**
+     * Helper to set value safely
+     */
+    function setSafeValue(select, value) {
+        const exists = Array.from(select.options).some(opt => opt.value === value);
+        if (exists) {
+            select.value = value;
+        } else {
+            select.value = select.options[0].value;
+        }
+    }
 
     /**
-     * Returns allowed color options for a given model
+     * Initializes or Updates the Model Instance
      */
-    function getColorsForModel(modelId) {
-        if (modelId === 'Eric' || modelId === 'Ebbe') {
-            return colorOptions.filter(opt => !ericExcludedColors.includes(opt.text));
-        }
-        return colorOptions;
+    function updateModelInstance() {
+        state.currentModel = ModelFactory.create(state.model_id, state.conf_id);
     }
 
     /**
      * Updates the Front and Back dropdowns based on selected model
      */
-    function updateColorDropdowns(modelId) {
-        const allowedOptions = getColorsForModel(modelId);
+    function updateColorDropdowns() {
+        const allowedOptions = state.currentModel.getAllowedColors();
 
         // Store current selections
         const currentFront = frontSelect.value;
@@ -73,84 +245,60 @@ document.addEventListener('DOMContentLoaded', () => {
         populateSelect(frontSelect, allowedOptions);
         populateSelect(backSelect, allowedOptions);
 
-        // Restore selections if valid, otherwise duplicate check logic handles default
-        // Helper to set value safely
-        function setSafeValue(select, value) {
-            const exists = Array.from(select.options).some(opt => opt.value === value);
-            if (exists) {
-                select.value = value;
-            } else {
-                select.value = select.options[0].value;
-            }
-        }
-
         setSafeValue(frontSelect, currentFront);
 
-        // Use DOM element directly to avoid state dependency issue during initialization
-        if (syncCheckbox.checked) {
-            // If linked, force back to match front (which might have just been reset)
+        if (state.linked) {
             backSelect.value = frontSelect.value;
         } else {
             setSafeValue(backSelect, currentBack);
         }
 
-        // Update state if initialized
-        if (state) {
-            state.front = frontSelect.value;
-            state.back = backSelect.value;
-        }
-
-        // No need to call updateUI here as it will be called by the caller or subsequent state updates
+        // Update state
+        state.front = frontSelect.value;
+        state.back = backSelect.value;
     }
 
-    // Initialize Dropdowns
-    updateColorDropdowns(modelSelect.value);
+    /**
+     * Updates the Rim Colour dropdown based on selected model
+     */
+    function updateRimOptions() {
+        const options = state.currentModel.getRimOptions();
 
-    // State definition
-    state = {
-        base: "https://customiser-images.lindberg.com/model/{type_id}/{model_id}/{perspective}/{variant}/ACETATE",
-        front: frontSelect.value,
-        back: backSelect.value,
-        rim: rimSelect.value,
-        perspective: perspectiveSelect.value,
-        model_id: modelSelect.value,
-        conf_id: modelSelect.options[modelSelect.selectedIndex].getAttribute('data-conf'),
-        get type_id() {
-            return (this.model_id === 'Eric' || this.model_id === 'Ebbe') ? 'RIM' : 'TT';
-        },
-        get variant() {
-            return (this.model_id === 'Eric' || this.model_id === 'Ebbe') ? 'RIM_BASIC' : '850';
-        },
-        linked: syncCheckbox.checked
-    };
+        // Clear and Populate
+        rimSelect.innerHTML = '';
+        options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.text;
+            rimSelect.appendChild(option);
+        });
+
+        // Update state
+        state.rim = rimSelect.value;
+    }
 
     /**
-     * Constructs the final URL by replacing placeholders with current values
+     * Constructs the final URL
      */
     function buildUrl() {
-        if (!state.base) return '';
+        if (!state.base || !state.currentModel) return '';
 
         // Replace placeholders in base path
         let url = state.base;
-        url = url.replace(/{type_id}/g, encodeURIComponent(state.type_id));
+        url = url.replace(/{type_id}/g, encodeURIComponent(state.currentModel.getTypeId()));
         url = url.replace(/{model_id}/g, encodeURIComponent(state.model_id));
         url = url.replace(/{perspective}/g, encodeURIComponent(state.perspective));
-        url = url.replace(/{variant}/g, encodeURIComponent(state.variant));
+        url = url.replace(/{variant}/g, encodeURIComponent(state.currentModel.getVariant()));
 
-        // Construct query parameters based on model
-        let queryParams = [];
-        const commonParams = `INNERRIM=${encodeURIComponent(state.rim)}&TEMPLE=${encodeURIComponent(state.back)}&CONF=${encodeURIComponent(state.conf_id)}`;
+        // Get Query Params from Model Strategy
+        const queryParams = state.currentModel.getUrlParams(
+            state.front,
+            state.back,
+            state.rim,
+            state.conf_id
+        );
 
-        if (state.model_id === 'Eric' || state.model_id === 'Ebbe') {
-            queryParams.push(`LOWERRIM=${encodeURIComponent(state.front)}`);
-            queryParams.push(`UPPERRIM=${encodeURIComponent(state.front)}`);
-        } else {
-            queryParams.push(`FRONT=${encodeURIComponent(state.front)}`);
-        }
-
-        queryParams.push(commonParams);
-
-        return `${url}?${queryParams.join('&')}`;
+        return `${url}?${queryParams}`;
     }
 
     /**
@@ -166,9 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Show loading state could be added here if we had a proper load event handler setup
-        // For now, swap source
-
         previewImage.onload = () => {
             previewImage.classList.add('visible');
             emptyState.classList.add('hidden');
@@ -177,74 +322,13 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.onerror = () => {
             previewImage.classList.remove('visible');
             emptyState.classList.remove('hidden');
-            // Maybe show an error message in a real app
         };
 
         previewImage.src = finalUrl;
     }
 
-    // Dynamic Rims Configuration
-    const rimOptions = {
-        '5808': [
-            { text: 'Green', value: 'K277' },
-            { text: 'Blue', value: 'K160' },
-            { text: 'Beige', value: 'K223' },
-            { text: 'Havana', value: 'K25' },
-            { text: 'Black', value: 'K24M' }
-        ],
-        '5801': [
-            { text: 'Green', value: 'K175' },
-            { text: 'Black', value: 'K263' },
-            { text: 'Havana', value: 'K25' },
-            { text: 'Beige', value: 'K223' },
-            { text: 'Grey', value: 'K26' },
-            { text: 'Tortoise', value: 'K204' },
-            { text: 'Deep red', value: 'K258' }
-        ],
-        '5810': [
-            { text: 'Green', value: 'K175' },
-            { text: 'Dark Blue', value: 'K259' },
-            { text: 'Tortoise', value: 'K204' },
-            { text: 'Black', value: 'K24M' }
-        ],
-        'Eric': [
-            { text: 'Green', value: 'K175' },
-            { text: 'Dark Blue', value: 'K259' },
-            { text: 'Tortoise', value: 'K204' },
-            { text: 'Black', value: 'K24M' },
-            { text: 'Grey Transp.', value: 'K272' }
-        ],
-        'Ebbe': [
-            { text: 'Green', value: 'K175' },
-            { text: 'Havana', value: 'K25' },
-            { text: 'Shiny Black', value: 'K199' }
-        ]
-    };
+    // --- Event Listeners ---
 
-    /**
-     * Updates the Rim Colour dropdown based on selected model
-     */
-    function updateRimOptions(modelId) {
-        // Clear existing options
-        rimSelect.innerHTML = '';
-
-        // Determine which set to use, default to 5808 options if not found to be safe
-        const options = rimOptions[modelId] || rimOptions['5808'];
-
-        // Add new options
-        options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt.value;
-            option.textContent = opt.text;
-            rimSelect.appendChild(option);
-        });
-
-        // Update state with new default selection (first one)
-        state.rim = rimSelect.value;
-        updateUI();
-    }
-
-    // Event Listeners
     frontSelect.addEventListener('change', (e) => {
         state.front = e.target.value;
         if (state.linked) {
@@ -287,24 +371,23 @@ document.addEventListener('DOMContentLoaded', () => {
         state.model_id = e.target.value;
         state.conf_id = e.target.options[e.target.selectedIndex].getAttribute('data-conf');
 
-        // Update Rim options based on model
-        updateRimOptions(state.model_id);
+        // 1. Update Model Instance
+        updateModelInstance();
 
-        // Update Color options based on model
-        updateColorDropdowns(state.model_id);
+        // 2. Update Options based on new model
+        updateRimOptions();
+        updateColorDropdowns();
 
-        // Update UI
+        // 3. Update UI
         updateUI();
     });
 
-    // Copy to clipboard
     copyBtn.addEventListener('click', async () => {
         if (!finalUrlInput.value) return;
 
         try {
             await navigator.clipboard.writeText(finalUrlInput.value);
 
-            // Temporary feedback
             const originalIcon = copyBtn.innerHTML;
             copyBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2">
@@ -323,6 +406,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initial render
+    // --- Initialization ---
+    // Initialize Model Instance first
+    updateModelInstance();
+    // Then correct the dropdowns to match the initial model
+    updateColorDropdowns();
+    updateRimOptions();
+    // Finally render
     updateUI();
 });
