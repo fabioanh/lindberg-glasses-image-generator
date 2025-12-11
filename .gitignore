@@ -1,0 +1,14 @@
+# System Files
+.DS_Store
+.Thumbnails
+.Trashes
+
+# Node modules
+node_modules/
+npm-debug.log
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo

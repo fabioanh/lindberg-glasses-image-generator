@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Configuration | URL Builder</title>
+    <meta name="description" content="Dynamically build image URLs by selecting configuration parameters.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Glasses Configurator</h1>
+            <p>Lindberg glasses configurator</p>
+        </header>
+
+        <main class="main-layout">
+            <!-- Top Controls Bar -->
+            <section class="controls-bar glass-panel">
+                <div class="control-group">
+                    <label for="model">Model</label>
+                    <select id="model">
+                        <option value="5808" data-conf="TT5808">5808 (Default)</option>
+                        <option value="5801" data-conf="TTI">5801</option>
+                        <option value="5810" data-conf="TTI">5810</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="perspective">Perspective</label>
+                    <select id="perspective">
+                        <option value="Perspective">Side</option>
+                        <option value="Front">Front</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="front-color">Front</label>
+                    <select id="front-color">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+
+                <div class="control-group checkbox-wrapper">
+                    <label for="sync-colors" class="checkbox-label" title="Sync Front & Back">
+                        <input type="checkbox" id="sync-colors">
+                        <span class="icon-link">🔗</span>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label for="back-color">Back</label>
+                    <select id="back-color">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="rim-color">Rim</label>
+                    <select id="rim-color">
+                        <option value="K277">Green</option>
+                        <option value="K160">Blue</option>
+                        <option value="K223">Beige</option>
+                        <option value="K25">Havana</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Main Image Area -->
+            <section class="image-area">
+                <div id="loading-indicator" class="loader hidden"></div>
+                <img id="preview-image" src="" alt="Preview">
+            </section>
+
+            <!-- Bottom URL Bar -->
+            <section class="footer-bar glass-panel">
+                <div class="url-group">
+                    <span class="url-label">Generated URL:</span>
+                    <input type="text" id="final-url" readonly>
+                    <button id="copy-btn" class="icon-btn" title="Copy to clipboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

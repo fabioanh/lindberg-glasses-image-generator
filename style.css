@@ -1,0 +1,282 @@
+:root {
+    --bg-color: #0d1117;
+    --glass-bg: rgba(22, 27, 34, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent-color: #58a6ff;
+    --accent-glow: rgba(88, 166, 255, 0.15);
+    --control-bg: #21262d;
+    --control-border: #30363d;
+    --control-hover: #30363d;
+    --success-color: #238636;
+
+    --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+    --radius-lg: 16px;
+    --radius-md: 8px;
+    --shadow-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-heading);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(88, 166, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(121, 192, 255, 0.05) 0%, transparent 20%);
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.app-header {
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.app-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #fff 0%, #8b949e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+}
+
+.app-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Main Layout */
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px);
+    /* Adjust based on header height */
+    gap: 20px;
+}
+
+/* Glass Panels */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Controls Bar (Top) */
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 24px;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+}
+
+.control-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.control-group select {
+    background: var(--control-bg);
+    border: 1px solid var(--control-border);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    appearance: none;
+    cursor: pointer;
+}
+
+.control-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Checkbox specific styling */
+.checkbox-wrapper {
+    min-width: auto;
+    justify-content: center;
+    height: 100%;
+    padding-top: 18px;
+    /* Alignment hack */
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: var(--control-bg);
+    border: 1px solid var(--control-border);
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+}
+
+.checkbox-label:hover {
+    background: var(--control-hover);
+}
+
+.checkbox-label input {
+    display: none;
+}
+
+.icon-link {
+    font-size: 1.2rem;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+    filter: grayscale(1);
+}
+
+.checkbox-label input:checked+.icon-link {
+    opacity: 1;
+    filter: none;
+}
+
+.checkbox-label:has(input:checked) {
+    border-color: var(--accent-color);
+    background: rgba(88, 166, 255, 0.1);
+}
+
+/* Image Area (Center) */
+.image-area {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+#preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+}
+
+.empty-state {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Footer Bar (Bottom) */
+.footer-bar {
+    padding: 12px 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.url-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.url-label {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.url-group input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    color: var(--accent-color);
+    font-family: monospace;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.icon-btn {
+    background: transparent;
+    border: 1px solid var(--control-border);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: var(--control-hover);
+    color: var(--text-primary);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    body {
+        padding: 20px;
+        height: auto;
+        display: block;
+    }
+
+    .main-layout {
+        height: auto;
+        min-height: 80vh;
+    }
+
+    .controls-bar {
+        justify-content: flex-start;
+    }
+
+    .control-group {
+        flex: 1;
+        min-width: 45%;
+    }
+
+    .checkbox-wrapper {
+        min-width: auto;
+        flex: 0;
+    }
+}
