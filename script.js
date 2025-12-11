@@ -41,19 +41,86 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize Dropdowns
-    populateSelect(frontSelect, colorOptions);
-    populateSelect(backSelect, colorOptions);
+    // Initialize Dropdowns - Moved to function to allow dynamic updates
 
-    // State
-    const state = {
-        base: "https://customiser-images.lindberg.com/model/TT/{model_id}/{perspective}/850/ACETATE?FRONT={front}&INNERRIM={rim}&TEMPLE={back}&CONF={conf_id}",
+    // Eric Excluded Colors
+    const ericExcludedColors = ['Light Silver', 'Orange', 'Wine', 'Sky Blue', 'Blue'];
+
+    // State variable declaration
+    let state;
+
+    /**
+     * Returns allowed color options for a given model
+     */
+    function getColorsForModel(modelId) {
+        if (modelId === 'Eric') {
+            return colorOptions.filter(opt => !ericExcludedColors.includes(opt.text));
+        }
+        return colorOptions;
+    }
+
+    /**
+     * Updates the Front and Back dropdowns based on selected model
+     */
+    function updateColorDropdowns(modelId) {
+        const allowedOptions = getColorsForModel(modelId);
+
+        // Store current selections
+        const currentFront = frontSelect.value;
+        const currentBack = backSelect.value;
+
+        // Populate Dropdowns
+        populateSelect(frontSelect, allowedOptions);
+        populateSelect(backSelect, allowedOptions);
+
+        // Restore selections if valid, otherwise duplicate check logic handles default
+        // Helper to set value safely
+        function setSafeValue(select, value) {
+            const exists = Array.from(select.options).some(opt => opt.value === value);
+            if (exists) {
+                select.value = value;
+            } else {
+                select.value = select.options[0].value;
+            }
+        }
+
+        setSafeValue(frontSelect, currentFront);
+
+        // Use DOM element directly to avoid state dependency issue during initialization
+        if (syncCheckbox.checked) {
+            // If linked, force back to match front (which might have just been reset)
+            backSelect.value = frontSelect.value;
+        } else {
+            setSafeValue(backSelect, currentBack);
+        }
+
+        // Update state if initialized
+        if (state) {
+            state.front = frontSelect.value;
+            state.back = backSelect.value;
+        }
+
+        // No need to call updateUI here as it will be called by the caller or subsequent state updates
+    }
+
+    // Initialize Dropdowns
+    updateColorDropdowns(modelSelect.value);
+
+    // State definition
+    state = {
+        base: "https://customiser-images.lindberg.com/model/{type_id}/{model_id}/{perspective}/{variant}/ACETATE",
         front: frontSelect.value,
         back: backSelect.value,
         rim: rimSelect.value,
         perspective: perspectiveSelect.value,
         model_id: modelSelect.value,
         conf_id: modelSelect.options[modelSelect.selectedIndex].getAttribute('data-conf'),
+        get type_id() {
+            return this.model_id === 'Eric' ? 'RIM' : 'TT';
+        },
+        get variant() {
+            return this.model_id === 'Eric' ? 'RIM_BASIC' : '850';
+        },
         linked: syncCheckbox.checked
     };
 
@@ -63,19 +130,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildUrl() {
         if (!state.base) return '';
 
-        // Replace placeholders safely
+        // Replace placeholders in base path
         let url = state.base;
-
-        // Only replace if the placeholders exist
-        // Note: We use global replace in case they appear multiple times
-        url = url.replace(/{front}/g, encodeURIComponent(state.front));
-        url = url.replace(/{back}/g, encodeURIComponent(state.back));
-        url = url.replace(/{rim}/g, encodeURIComponent(state.rim));
-        url = url.replace(/{perspective}/g, encodeURIComponent(state.perspective));
+        url = url.replace(/{type_id}/g, encodeURIComponent(state.type_id));
         url = url.replace(/{model_id}/g, encodeURIComponent(state.model_id));
-        url = url.replace(/{conf_id}/g, encodeURIComponent(state.conf_id));
+        url = url.replace(/{perspective}/g, encodeURIComponent(state.perspective));
+        url = url.replace(/{variant}/g, encodeURIComponent(state.variant));
 
-        return url;
+        // Construct query parameters based on model
+        let queryParams = [];
+        const commonParams = `INNERRIM=${encodeURIComponent(state.rim)}&TEMPLE=${encodeURIComponent(state.back)}&CONF=${encodeURIComponent(state.conf_id)}`;
+
+        if (state.model_id === 'Eric') {
+            queryParams.push(`LOWERRIM=${encodeURIComponent(state.front)}`);
+            queryParams.push(`UPPERRIM=${encodeURIComponent(state.front)}`);
+        } else {
+            queryParams.push(`FRONT=${encodeURIComponent(state.front)}`);
+        }
+
+        queryParams.push(commonParams);
+
+        return `${url}?${queryParams.join('&')}`;
     }
 
     /**
@@ -128,7 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         '5810': [
             { text: 'Green', value: 'K175' },
-            { text: 'Black', value: 'K259' },
+            { text: 'Dark Blue', value: 'K259' },
+            { text: 'Tortoise', value: 'K204' },
+            { text: 'Black', value: 'K24M' }
+        ],
+        'Eric': [
+            { text: 'Green', value: 'K175' },
+            { text: 'Dark Blue', value: 'K259' },
             { text: 'Tortoise', value: 'K204' },
             { text: 'Black', value: 'K24M' }
         ]
@@ -202,6 +283,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Rim options based on model
         updateRimOptions(state.model_id);
+
+        // Update Color options based on model
+        updateColorDropdowns(state.model_id);
+
+        // Update UI
+        updateUI();
     });
 
     // Copy to clipboard
