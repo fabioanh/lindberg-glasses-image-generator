@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Feature Flag
     const IS_HUMAN_MODE_ENABLED = true;
 
-    const IS_LIKE_BTN_ENABLED = true;
+    const IS_LIKE_BTN_ENABLED = false;
     const LIKEBTN_SITE_ID = '693b6fa7fa8fdf484b93e432';
 
     // Data Configuration
