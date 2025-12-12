@@ -19,7 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Feature Flag
     const IS_HUMAN_MODE_ENABLED = true;
+
     const IS_LIKE_BTN_ENABLED = true;
+    const LIKEBTN_SITE_ID = '693b6fa7fa8fdf484b93e432';
 
     // Data Configuration
     const CONFIG = {
@@ -418,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         span.setAttribute('data-ef_voting', 'wobble');
         span.setAttribute('data-identifier', `model_${state.model_id}`);
         span.setAttribute('data-show_like_label', 'false');
+        span.setAttribute('data-site_id', LIKEBTN_SITE_ID);
 
         likeBtnContainer.appendChild(span);
 
