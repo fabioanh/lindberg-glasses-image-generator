@@ -15,9 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const humanModeContainer = document.getElementById('human-mode-container');
     const humanModeToggle = document.getElementById('human-mode-toggle');
     const footerPanel = document.querySelector('.footer-bar'); // Use querySelector for class
+    const likeBtnContainer = document.getElementById('likebtn-container');
 
     // Feature Flag
     const IS_HUMAN_MODE_ENABLED = true;
+    const IS_LIKE_BTN_ENABLED = true;
 
     // Data Configuration
     const CONFIG = {
@@ -397,6 +399,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+    /**
+     * Updates the LikeBtn widget for the current model
+     */
+    function updateLikeBtn() {
+        if (!state.currentModel || !likeBtnContainer) return;
+
+        // Clear container
+        likeBtnContainer.innerHTML = '';
+
+        if (!IS_LIKE_BTN_ENABLED) return;
+
+        // Create new widget element
+        const span = document.createElement('span');
+        span.className = 'likebtn-wrapper';
+        span.setAttribute('data-theme', 'roundthumb');
+        span.setAttribute('data-ef_voting', 'wobble');
+        span.setAttribute('data-identifier', `model_${state.model_id}`);
+        span.setAttribute('data-show_like_label', 'false');
+
+        likeBtnContainer.appendChild(span);
+
+        // Re-initialize LikeBtn if library is loaded
+        if (window.LikeBtn) {
+            window.LikeBtn.init();
+        }
+    }
+
     // --- Event Listeners ---
 
     if (IS_HUMAN_MODE_ENABLED) {
@@ -458,7 +488,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateRimOptions();
         updateColorDropdowns();
 
-        // 3. Update UI
+        // 3. Update Like Button
+        updateLikeBtn();
+
+        // 4. Update UI
         if (state.isHumanMode) {
             updateOneUIState();
         } else {
@@ -496,6 +529,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Then correct the dropdowns to match the initial model
     updateColorDropdowns();
     updateRimOptions();
+    // Initialize Like Button
+    updateLikeBtn();
     // Finally render
     updateUI();
 });
