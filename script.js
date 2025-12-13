@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Feature Flag
     const IS_HUMAN_MODE_ENABLED = true;
 
-    const IS_LIKE_BTN_ENABLED = false;
+    const IS_LIKE_BTN_ENABLED = true;
     const LIKEBTN_SITE_ID = '693b6fa7fa8fdf484b93e432';
 
     // Data Configuration
@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
             '5808': 'https://drive.google.com/thumbnail?id=1CqVG7dWCwhenqqafYLWyYAZnkMYdua2G&sz=w1000',
             '5801': 'https://drive.google.com/thumbnail?id=19GKx6a8UqDIK9jAQb68GeGRShzUUwoq9&sz=w1000',
             '5810': 'https://drive.google.com/thumbnail?id=1fktSFvLmbrLy32xWkzmvD-plXLlUWCmy&sz=w1000',
-            'Eric': 'https://not.available.yet', // Not available
+            'Eric': 'https://drive.google.com/thumbnail?id=1sWTVNgz89D4WV4gg6MU-qjw27gXIMSKj&sz=w1000',
             'Ebbe': 'https://drive.google.com/thumbnail?id=1ie_OqdbTU-Ona0hcAIu0eTJpRsZaa_rz&sz=w1000',
             'Gunter': 'https://drive.google.com/thumbnail?id=1kn805FDT3cO37k5RMd5nc8q3ZYxQM9Ij&sz=w1000',
-            'Lex': 'https://not.available.yet' // Not available
+            'Lex': 'https://drive.google.com/thumbnail?id=1RlTexhzaLudGMcVlCPYweYxDVM5agAox&sz=w1000'
         },
         colors: [
             { text: 'Navy Grey', value: 'U16' },
