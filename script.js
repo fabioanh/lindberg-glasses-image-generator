@@ -421,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         span.setAttribute('data-identifier', `model_${state.model_id}`);
         span.setAttribute('data-show_like_label', 'false');
         span.setAttribute('data-site_id', LIKEBTN_SITE_ID);
+        span.setAttribute('data-counter_show', 'false');
 
         likeBtnContainer.appendChild(span);
 
