@@ -45,7 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { text: 'Orange', value: 'U15' },
             { text: 'Black', value: 'U9' },
             { text: 'Light Silver', value: '05' },
-            { text: 'Grey', value: '10' }
+            { text: 'Grey', value: '10' },
+            { text: 'Green', value: '30' }
         ],
         ericExcludedColors: ['Light Silver', 'Orange', 'Wine', 'Sky Blue', 'Blue'],
         rims: {
